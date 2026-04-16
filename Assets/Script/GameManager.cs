@@ -4,22 +4,23 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
-    // DINHEIRO
-    public float dinheiro = 0f;
+    // DINHEIRO EM CÊNTIMOS
+    public int dinheiro = 0;
 
     // CLIQUE
-    public float valorClique = 1f;
-    public float custoUpgrade = 50f;
+    public int valorClique = 1;
+    public int custoUpgrade = 10;
 
-    // AUTO CLICKER
-    public float valorAuto = 0f;
-    public float proximoAumentoAuto = 0.1f;
-    public float custoAuto = 25f;
+    // AUTO FRITADEIRA
+    public int valorAuto = 0;
+    public int proximoAumentoAuto = 1;
+    public int custoAuto = 25;
 
     // TEXTOS
     public TextMeshProUGUI textoDinheiro;
     public TextMeshProUGUI textoUpgrade;
     public TextMeshProUGUI textoAuto;
+    public TextMeshProUGUI textoObjetivo;
 
     // MENU
     public GameObject menuUpgrades;
@@ -28,8 +29,8 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        valorAuto = 0f;
-        proximoAumentoAuto = 0.1f;
+        valorAuto = 0;
+        proximoAumentoAuto = 1;
 
         if (menuUpgrades != null)
         {
@@ -52,8 +53,8 @@ public class GameManager : MonoBehaviour
         if (dinheiro >= custoUpgrade)
         {
             dinheiro -= custoUpgrade;
-            valorClique += 1f;
-            custoUpgrade *= 2.0f;
+            valorClique += 1;
+            custoUpgrade *= 2;
             AtualizarTexto();
         }
     }
@@ -66,7 +67,7 @@ public class GameManager : MonoBehaviour
             dinheiro -= custoAuto;
 
             valorAuto += proximoAumentoAuto;
-            proximoAumentoAuto += 0.1f;
+            proximoAumentoAuto += 1;
 
             if (!autoAtivo)
             {
@@ -74,7 +75,7 @@ public class GameManager : MonoBehaviour
                 StartCoroutine(ProducaoAutomatica());
             }
 
-            custoAuto *= 1.8f;
+            custoAuto = Mathf.RoundToInt(custoAuto * 1.8f);
             AtualizarTexto();
         }
     }
@@ -108,17 +109,44 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // CONVERTER CÊNTIMOS PARA TEXTO
+    string FormatarDinheiro(int valor)
+    {
+        if (valor < 100)
+        {
+            return valor + " c";
+        }
+        else
+        {
+            float euros = valor / 100f;
+
+            if (valor % 100 == 0)
+            {
+                return euros.ToString("F0") + " euro";
+            }
+            else
+            {
+                return euros.ToString("F2") + " euros";
+            }
+        }
+    }
+
     // ATUALIZAR TEXTOS
     void AtualizarTexto()
     {
-        textoDinheiro.text = "Dinheiro: " + dinheiro.ToString("F1") + "€";
+        textoDinheiro.text = "Dinheiro: " + FormatarDinheiro(dinheiro);
 
         textoUpgrade.text =
-            "Upgrade Clique\nCusto: " + custoUpgrade.ToString("F1") +
-            "€\n+" + valorClique.ToString("F1") + " por clique";
+            "Upgrade Clique\nCusto: " + FormatarDinheiro(custoUpgrade) +
+            "\n+" + valorClique + " c por clique";
 
         textoAuto.text =
-            "Auto Fritadeira\nCusto: " + custoAuto.ToString("F1") +
-            "€\n+" + proximoAumentoAuto.ToString("F1") + "/seg";
+            "Auto Fritadeira\nCusto: " + FormatarDinheiro(custoAuto) +
+            "\n+" + proximoAumentoAuto + " c/seg";
+
+        if (textoObjetivo != null)
+        {
+            textoObjetivo.text = "Objetivo: " + FormatarDinheiro(dinheiro);
+        }
     }
 }

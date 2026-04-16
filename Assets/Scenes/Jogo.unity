@@ -902,11 +902,12 @@ MonoBehaviour:
   valorClique: 1
   custoUpgrade: 10
   valorAuto: 0
-  proximoAumentoAuto: 0.1
-  custoAuto: 50
+  proximoAumentoAuto: 1
+  custoAuto: 25
   textoDinheiro: {fileID: 1153412357}
   textoUpgrade: {fileID: 1632799973}
   textoAuto: {fileID: 1496892596}
+  textoObjetivo: {fileID: 0}
   menuUpgrades: {fileID: 142144251}
 --- !u!4 &903839927
 Transform:
@@ -1139,8 +1140,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -131, y: 105}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 2.7702, y: 92.9856}
+  m_SizeDelta: {x: 469.4864, y: 79.0687}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1191764030
 GameObject:
