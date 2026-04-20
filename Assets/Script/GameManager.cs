@@ -11,15 +11,25 @@ public class GameManager : MonoBehaviour
     public int valorClique = 1;
     public int custoUpgrade = 10;
 
-    // AUTO FRITADEIRA
+    // AUTO
     public int valorAuto = 0;
     public int proximoAumentoAuto = 1;
     public int custoAuto = 25;
+
+    // NOVO UPGRADE: ÓLEO MELHOR
+    public int custoOleo = 40;
+    public int bonusOleo = 2;
+
+    // NOVO UPGRADE: AJUDANTE
+    public int custoAjudante = 60;
+    public int bonusAjudante = 2;
 
     // TEXTOS
     public TextMeshProUGUI textoDinheiro;
     public TextMeshProUGUI textoUpgrade;
     public TextMeshProUGUI textoAuto;
+    public TextMeshProUGUI textoOleo;
+    public TextMeshProUGUI textoAjudante;
     public TextMeshProUGUI textoObjetivo;
 
     // MENU
@@ -80,6 +90,37 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // ÓLEO MELHOR
+    public void ComprarOleo()
+    {
+        if (dinheiro >= custoOleo)
+        {
+            dinheiro -= custoOleo;
+            valorClique += bonusOleo;
+            custoOleo = Mathf.RoundToInt(custoOleo * 2.2f);
+            AtualizarTexto();
+        }
+    }
+
+    // AJUDANTE
+    public void ComprarAjudante()
+    {
+        if (dinheiro >= custoAjudante)
+        {
+            dinheiro -= custoAjudante;
+            valorAuto += bonusAjudante;
+
+            if (!autoAtivo)
+            {
+                autoAtivo = true;
+                StartCoroutine(ProducaoAutomatica());
+            }
+
+            custoAjudante = Mathf.RoundToInt(custoAjudante * 2.2f);
+            AtualizarTexto();
+        }
+    }
+
     // PRODUÇÃO AUTOMÁTICA
     IEnumerator ProducaoAutomatica()
     {
@@ -109,7 +150,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // CONVERTER CÊNTIMOS PARA TEXTO
+    // FORMATAR DINHEIRO
     string FormatarDinheiro(int valor)
     {
         if (valor < 100)
@@ -122,7 +163,10 @@ public class GameManager : MonoBehaviour
 
             if (valor % 100 == 0)
             {
-                return euros.ToString("F0") + " euro";
+                if (euros == 1)
+                    return euros.ToString("F0") + " euro";
+                else
+                    return euros.ToString("F0") + " euros";
             }
             else
             {
@@ -131,18 +175,32 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // ATUALIZAR TEXTOS
+    // ATUALIZAR UI
     void AtualizarTexto()
     {
         textoDinheiro.text = "Dinheiro: " + FormatarDinheiro(dinheiro);
 
         textoUpgrade.text =
-            "Upgrade Clique\nCusto: " + FormatarDinheiro(custoUpgrade) +
-            "\n+" + valorClique + " c por clique";
+            "Melhorar Massa\nCusto: " + FormatarDinheiro(custoUpgrade) +
+            "\n+1 c por clique";
 
         textoAuto.text =
             "Auto Fritadeira\nCusto: " + FormatarDinheiro(custoAuto) +
             "\n+" + proximoAumentoAuto + " c/seg";
+
+        if (textoOleo != null)
+        {
+            textoOleo.text =
+                "Óleo Melhor\nCusto: " + FormatarDinheiro(custoOleo) +
+                "\n+2 c por clique";
+        }
+
+        if (textoAjudante != null)
+        {
+            textoAjudante.text =
+                "Ajudante\nCusto: " + FormatarDinheiro(custoAjudante) +
+                "\n+2 c/seg";
+        }
 
         if (textoObjetivo != null)
         {
