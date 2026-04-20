@@ -4,25 +4,50 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
-    // DINHEIRO EM CÊNTIMOS
+    // DINHEIRO
     public int dinheiro = 0;
 
-    // CLIQUE
+    // CLIQUE BASE
     public int valorClique = 1;
     public int custoUpgrade = 10;
 
-    // AUTO
+    // AUTO BASE
     public int valorAuto = 0;
     public int proximoAumentoAuto = 1;
     public int custoAuto = 25;
 
-    // NOVO UPGRADE: ÓLEO MELHOR
+    // ÓLEO
     public int custoOleo = 40;
     public int bonusOleo = 2;
 
-    // NOVO UPGRADE: AJUDANTE
+    // AJUDANTE
     public int custoAjudante = 60;
     public int bonusAjudante = 2;
+
+    // BANCA MAIOR
+    public int custoBancaMaior = 120;
+    public int bonusBancaMaior = 5;
+
+    // SEGUNDA FRITADEIRA
+    public int custoSegundaFritadeira = 150;
+    public int bonusSegundaFritadeira = 5;
+
+    // PUBLICIDADE
+    public int custoPublicidade = 200;
+    public float bonusPublicidade = 1.2f;
+
+    // RECEITA ESPECIAL
+    public int custoReceitaEspecial = 300;
+    public float bonusReceitaEspecial = 1.5f;
+
+    // FESTA POPULAR
+    public int custoFestaPopular = 400;
+    public float multiplicadorFestaPopular = 2f;
+    public float duracaoFestaPopular = 10f;
+
+    // MULTIPLICADOR GLOBAL
+    private float multiplicadorGlobal = 1f;
+    private bool festaAtiva = false;
 
     // TEXTOS
     public TextMeshProUGUI textoDinheiro;
@@ -30,6 +55,11 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI textoAuto;
     public TextMeshProUGUI textoOleo;
     public TextMeshProUGUI textoAjudante;
+    public TextMeshProUGUI textoBancaMaior;
+    public TextMeshProUGUI textoSegundaFritadeira;
+    public TextMeshProUGUI textoPublicidade;
+    public TextMeshProUGUI textoReceitaEspecial;
+    public TextMeshProUGUI textoFestaPopular;
     public TextMeshProUGUI textoObjetivo;
 
     // MENU
@@ -53,11 +83,11 @@ public class GameManager : MonoBehaviour
     // CLICAR NA FARTURA
     public void Clicar()
     {
-        dinheiro += valorClique;
+        dinheiro += Mathf.RoundToInt(valorClique * multiplicadorGlobal);
         AtualizarTexto();
     }
 
-    // UPGRADE DO CLIQUE
+    // UPGRADE BASE - MASSA
     public void ComprarUpgrade()
     {
         if (dinheiro >= custoUpgrade)
@@ -69,7 +99,7 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    // AUTO FRITADEIRA
+    // AUTO BASE - FRITADEIRA
     public void ComprarAuto()
     {
         if (dinheiro >= custoAuto)
@@ -121,13 +151,93 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    // BANCA MAIOR
+    public void ComprarBancaMaior()
+    {
+        if (dinheiro >= custoBancaMaior)
+        {
+            dinheiro -= custoBancaMaior;
+            valorClique += bonusBancaMaior;
+            custoBancaMaior = Mathf.RoundToInt(custoBancaMaior * 2.5f);
+            AtualizarTexto();
+        }
+    }
+
+    // SEGUNDA FRITADEIRA
+    public void ComprarSegundaFritadeira()
+    {
+        if (dinheiro >= custoSegundaFritadeira)
+        {
+            dinheiro -= custoSegundaFritadeira;
+            valorAuto += bonusSegundaFritadeira;
+
+            if (!autoAtivo)
+            {
+                autoAtivo = true;
+                StartCoroutine(ProducaoAutomatica());
+            }
+
+            custoSegundaFritadeira = Mathf.RoundToInt(custoSegundaFritadeira * 2.5f);
+            AtualizarTexto();
+        }
+    }
+
+    // PUBLICIDADE NA FEIRA
+    public void ComprarPublicidade()
+    {
+        if (dinheiro >= custoPublicidade)
+        {
+            dinheiro -= custoPublicidade;
+            multiplicadorGlobal *= bonusPublicidade;
+            custoPublicidade = Mathf.RoundToInt(custoPublicidade * 2.8f);
+            AtualizarTexto();
+        }
+    }
+
+    // RECEITA ESPECIAL
+    public void ComprarReceitaEspecial()
+    {
+        if (dinheiro >= custoReceitaEspecial)
+        {
+            dinheiro -= custoReceitaEspecial;
+            multiplicadorGlobal *= bonusReceitaEspecial;
+            custoReceitaEspecial = Mathf.RoundToInt(custoReceitaEspecial * 3f);
+            AtualizarTexto();
+        }
+    }
+
+    // FESTA POPULAR
+    public void ComprarFestaPopular()
+    {
+        if (dinheiro >= custoFestaPopular && !festaAtiva)
+        {
+            dinheiro -= custoFestaPopular;
+            StartCoroutine(AtivarFestaPopular());
+            custoFestaPopular = Mathf.RoundToInt(custoFestaPopular * 3.5f);
+            AtualizarTexto();
+        }
+    }
+
+    IEnumerator AtivarFestaPopular()
+    {
+        festaAtiva = true;
+        multiplicadorGlobal *= multiplicadorFestaPopular;
+        AtualizarTexto();
+
+        yield return new WaitForSeconds(duracaoFestaPopular);
+
+        multiplicadorGlobal /= multiplicadorFestaPopular;
+        festaAtiva = false;
+        AtualizarTexto();
+    }
+
     // PRODUÇÃO AUTOMÁTICA
     IEnumerator ProducaoAutomatica()
     {
         while (true)
         {
             yield return new WaitForSeconds(1f);
-            dinheiro += valorAuto;
+            dinheiro += Mathf.RoundToInt(valorAuto * multiplicadorGlobal);
             AtualizarTexto();
         }
     }
@@ -164,9 +274,13 @@ public class GameManager : MonoBehaviour
             if (valor % 100 == 0)
             {
                 if (euros == 1)
+                {
                     return euros.ToString("F0") + " euro";
+                }
                 else
+                {
                     return euros.ToString("F0") + " euros";
+                }
             }
             else
             {
@@ -180,19 +294,25 @@ public class GameManager : MonoBehaviour
     {
         textoDinheiro.text = "Dinheiro: " + FormatarDinheiro(dinheiro);
 
-        textoUpgrade.text =
-            "Melhorar Massa\nCusto: " + FormatarDinheiro(custoUpgrade) +
-            "\n+1 c por clique";
+        if (textoUpgrade != null)
+        {
+            textoUpgrade.text =
+                "Massa\nCusto: " + FormatarDinheiro(custoUpgrade) +
+                "\n+1 c/click";
+        }
 
-        textoAuto.text =
-            "Auto Fritadeira\nCusto: " + FormatarDinheiro(custoAuto) +
-            "\n+" + proximoAumentoAuto + " c/seg";
+        if (textoAuto != null)
+        {
+            textoAuto.text =
+                "Fritadeira\nCusto: " + FormatarDinheiro(custoAuto) +
+                "\n+" + proximoAumentoAuto + " c/seg";
+        }
 
         if (textoOleo != null)
         {
             textoOleo.text =
                 "Óleo Melhor\nCusto: " + FormatarDinheiro(custoOleo) +
-                "\n+2 c por clique";
+                "\n+2 c/click";
         }
 
         if (textoAjudante != null)
@@ -200,6 +320,49 @@ public class GameManager : MonoBehaviour
             textoAjudante.text =
                 "Ajudante\nCusto: " + FormatarDinheiro(custoAjudante) +
                 "\n+2 c/seg";
+        }
+
+        if (textoBancaMaior != null)
+        {
+            textoBancaMaior.text =
+                "Banca Maior\nCusto: " + FormatarDinheiro(custoBancaMaior) +
+                "\n+5 c/click";
+        }
+
+        if (textoSegundaFritadeira != null)
+        {
+            textoSegundaFritadeira.text =
+                "2ª Fritadeira\nCusto: " + FormatarDinheiro(custoSegundaFritadeira) +
+                "\n+5 c/seg";
+        }
+
+        if (textoPublicidade != null)
+        {
+            textoPublicidade.text =
+                "Publicidade\nCusto: " + FormatarDinheiro(custoPublicidade) +
+                "\n+20% global";
+        }
+
+        if (textoReceitaEspecial != null)
+        {
+            textoReceitaEspecial.text =
+                "Receita Especial\nCusto: " + FormatarDinheiro(custoReceitaEspecial) +
+                "\n+50% global";
+        }
+
+        if (textoFestaPopular != null)
+        {
+            if (festaAtiva)
+            {
+                textoFestaPopular.text =
+                    "Festa Popular\nATIVA!";
+            }
+            else
+            {
+                textoFestaPopular.text =
+                    "Festa Popular\nCusto: " + FormatarDinheiro(custoFestaPopular) +
+                    "\nX2 por 10s";
+            }
         }
 
         if (textoObjetivo != null)
