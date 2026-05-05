@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using TMPro;
 using System.Collections;
 
@@ -16,7 +16,7 @@ public class GameManager : MonoBehaviour
     public int proximoAumentoAuto = 1;
     public int custoAuto = 25;
 
-    // ”LEO
+    // √ìLEO
     public int custoOleo = 40;
     public int bonusOleo = 2;
 
@@ -49,6 +49,10 @@ public class GameManager : MonoBehaviour
     private float multiplicadorGlobal = 1f;
     private bool festaAtiva = false;
 
+    // SOM
+    public AudioSource audioSource;
+    public AudioClip somCompra;
+
     // TEXTOS
     public TextMeshProUGUI textoDinheiro;
     public TextMeshProUGUI textoUpgrade;
@@ -80,6 +84,15 @@ public class GameManager : MonoBehaviour
         AtualizarTexto();
     }
 
+    // SOM DE COMPRA
+    void TocarSomCompra()
+    {
+        if (audioSource != null && somCompra != null)
+        {
+            audioSource.PlayOneShot(somCompra);
+        }
+    }
+
     // CLICAR NA FARTURA
     public void Clicar()
     {
@@ -95,6 +108,7 @@ public class GameManager : MonoBehaviour
             dinheiro -= custoUpgrade;
             valorClique += 1;
             custoUpgrade *= 2;
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
@@ -116,11 +130,12 @@ public class GameManager : MonoBehaviour
             }
 
             custoAuto = Mathf.RoundToInt(custoAuto * 1.8f);
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
 
-    // ”LEO MELHOR
+    // √ìLEO MELHOR
     public void ComprarOleo()
     {
         if (dinheiro >= custoOleo)
@@ -128,6 +143,7 @@ public class GameManager : MonoBehaviour
             dinheiro -= custoOleo;
             valorClique += bonusOleo;
             custoOleo = Mathf.RoundToInt(custoOleo * 2.2f);
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
@@ -147,6 +163,7 @@ public class GameManager : MonoBehaviour
             }
 
             custoAjudante = Mathf.RoundToInt(custoAjudante * 2.2f);
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
@@ -159,6 +176,7 @@ public class GameManager : MonoBehaviour
             dinheiro -= custoBancaMaior;
             valorClique += bonusBancaMaior;
             custoBancaMaior = Mathf.RoundToInt(custoBancaMaior * 2.5f);
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
@@ -178,6 +196,7 @@ public class GameManager : MonoBehaviour
             }
 
             custoSegundaFritadeira = Mathf.RoundToInt(custoSegundaFritadeira * 2.5f);
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
@@ -190,6 +209,7 @@ public class GameManager : MonoBehaviour
             dinheiro -= custoPublicidade;
             multiplicadorGlobal *= bonusPublicidade;
             custoPublicidade = Mathf.RoundToInt(custoPublicidade * 2.8f);
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
@@ -202,6 +222,7 @@ public class GameManager : MonoBehaviour
             dinheiro -= custoReceitaEspecial;
             multiplicadorGlobal *= bonusReceitaEspecial;
             custoReceitaEspecial = Mathf.RoundToInt(custoReceitaEspecial * 3f);
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
@@ -214,6 +235,7 @@ public class GameManager : MonoBehaviour
             dinheiro -= custoFestaPopular;
             StartCoroutine(AtivarFestaPopular());
             custoFestaPopular = Mathf.RoundToInt(custoFestaPopular * 3.5f);
+            TocarSomCompra();
             AtualizarTexto();
         }
     }
@@ -231,7 +253,7 @@ public class GameManager : MonoBehaviour
         AtualizarTexto();
     }
 
-    // PRODU«√O AUTOM¡TICA
+    // PRODU√á√ÉO AUTOM√ÅTICA
     IEnumerator ProducaoAutomatica()
     {
         while (true)
@@ -292,7 +314,10 @@ public class GameManager : MonoBehaviour
     // ATUALIZAR UI
     void AtualizarTexto()
     {
-        textoDinheiro.text = "Dinheiro: " + FormatarDinheiro(dinheiro);
+        if (textoDinheiro != null)
+        {
+            textoDinheiro.text = "Dinheiro: " + FormatarDinheiro(dinheiro);
+        }
 
         if (textoUpgrade != null)
         {
@@ -311,7 +336,7 @@ public class GameManager : MonoBehaviour
         if (textoOleo != null)
         {
             textoOleo.text =
-                "”leo Melhor\nCusto: " + FormatarDinheiro(custoOleo) +
+                "√ìleo Melhor\nCusto: " + FormatarDinheiro(custoOleo) +
                 "\n+2 c/click";
         }
 
@@ -332,7 +357,7 @@ public class GameManager : MonoBehaviour
         if (textoSegundaFritadeira != null)
         {
             textoSegundaFritadeira.text =
-                "2™ Fritadeira\nCusto: " + FormatarDinheiro(custoSegundaFritadeira) +
+                "2¬™ Fritadeira\nCusto: " + FormatarDinheiro(custoSegundaFritadeira) +
                 "\n+5 c/seg";
         }
 
@@ -354,8 +379,7 @@ public class GameManager : MonoBehaviour
         {
             if (festaAtiva)
             {
-                textoFestaPopular.text =
-                    "Festa Popular\nATIVA!";
+                textoFestaPopular.text = "Festa Popular\nATIVA!";
             }
             else
             {
